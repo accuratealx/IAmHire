@@ -42,6 +42,7 @@ resourcestring
   rsExit          = 'Выход';
   rsHint          = 'Я здесь';
   rsBaloonCaption = 'Состояние';
+  rsMonitorOff    = 'Погасить монитор';
 
 
 procedure TApp.SetEnable(AEnable: Boolean);
@@ -70,6 +71,7 @@ procedure TApp.TrayIconMouseDown(Button: TsgeSystemTrayIconMouseButtons);
 const
   TID_Active = 1;
   TID_Exit = 2;
+  TID_MonitopOff = 3;
 var
   Menu: HMENU;
   s: WideString;
@@ -100,6 +102,9 @@ begin
   end;
   AppendMenuW(Menu, Flags, TID_Active, PWideChar(s));
 
+  //Выключить монитор
+  AppendMenuW(Menu, MF_STRING, TID_MonitopOff, PWideChar(WideString(Utf8ToAnsi(rsMonitorOff))));
+
   //Разделитель
   AppendMenuW(Menu, MF_SEPARATOR, 0, nil);
 
@@ -115,8 +120,9 @@ begin
 
   //Определить пункт
   case MenuID of
-    TID_Active: SetEnable(not FEnable);
-    TID_Exit  : PostMessage(FTrayIcon.Handle, WM_QUIT, 0, 0);
+    TID_Active    : SetEnable(not FEnable);
+    TID_Exit      : PostMessage(FTrayIcon.Handle, WM_QUIT, 0, 0);
+    TID_MonitopOff: SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2);
   end;
 
   //Удалить меню
