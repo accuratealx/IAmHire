@@ -51,7 +51,10 @@ begin
   FEnable := AEnable;
 
   //Изменить значёк
-  if FEnable then H := FIconOn.Handle else H := FIconOff.Handle;
+  if FEnable then
+    H := FIconOn.Handle
+  else
+    H := FIconOff.Handle;
   FTrayIcon.Icon := H;
 
   //Поправить задачу движения мыши
@@ -60,9 +63,37 @@ end;
 
 
 procedure TApp.TimerEvent;
+type
+  tagMOUSEINPUT = record
+    dx: LONG;
+    dy: LONG;
+    mouseData: DWORD;
+    dwFlags: DWORD;
+    time: DWORD;
+    dwExtraInfo: ULONG_PTR;
+  end;
+
+  tagINPUT = record
+    &type: DWORD;
+    Input: tagMOUSEINPUT;
+  end;
+
+const
+  INPUT_MOUSE = $0;
+var
+  Input: tagINPUT;
 begin
+  //Подготовить запись
+  ZeroMemory(@Input, SizeOf(Input));
+  Input.&type := INPUT_MOUSE;
+  Input.Input.dx := 0;
+  Input.Input.dy := 0;
+  Input.Input.mouseData := 0;
+  Input.Input.dwFlags := MOUSEEVENTF_MOVE;
+  Input.Input.time := 0;
+
   //Пошевелить мышку
-  mouse_event(MOUSEEVENTF_MOVE, 0, 0, 0, 0);
+  SendInput(1, @Input, SizeOf(Input));
 end;
 
 
@@ -77,7 +108,8 @@ var
   Pt: TPoint;
   MenuID: UINT;
 begin
-  if Button <> mbRight then Exit;
+  if Button <> mbRight then
+    Exit;
 
   //Создать меню
   Menu := 0;
@@ -87,16 +119,16 @@ begin
   Flags := MF_STRING;
   case FEnable of
     True:
-      begin
+    begin
       s := WideString(Utf8ToAnsi(rsEnable));
       Flags := Flags or MF_CHECKED;
-      end;
+    end;
 
     False:
-      begin
+    begin
       s := WideString(Utf8ToAnsi(rsDisable));
       Flags := Flags or MF_UNCHECKED;
-      end;
+    end;
   end;
   AppendMenuW(Menu, Flags, TID_Active, PWideChar(s));
 
@@ -106,7 +138,6 @@ begin
   //Выход
   AppendMenuW(Menu, MF_STRING, TID_Exit, PWideChar(WideString(Utf8ToAnsi(rsExit))));
 
-
   //Вызвать меню
   SetForegroundWindow(FTrayIcon.Handle);
   GetCursorPos(Pt);
@@ -115,8 +146,11 @@ begin
 
   //Определить пункт
   case MenuID of
-    TID_Active    : SetEnable(not FEnable);
-    TID_Exit      : PostMessage(FTrayIcon.Handle, WM_QUIT, 0, 0);
+    TID_Active:
+      SetEnable(not FEnable);
+
+    TID_Exit:
+      PostMessage(FTrayIcon.Handle, WM_QUIT, 0, 0);
   end;
 
   //Удалить меню
@@ -129,14 +163,17 @@ var
   s: String;
 begin
   if Button = mbLeft then
-    begin
+  begin
     //Переключить состояние
     SetEnable(not FEnable);
 
     //Показать сообщение
-    if FEnable then s := rsEnable else s := rsDisable;
+    if FEnable then
+      s := rsEnable
+    else
+      s := rsDisable;
     FTrayIcon.ShowMessage(rsBaloonCaption, s, mtInfo);
-    end;
+  end;
 end;
 
 
