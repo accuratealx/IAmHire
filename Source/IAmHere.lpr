@@ -37,11 +37,31 @@ var
 
 
 resourcestring
-  rsEnable        = 'Включено';
-  rsDisable       = 'Выключено';
-  rsExit          = 'Выход';
-  rsHint          = 'Я здесь';
-  rsBaloonCaption = 'Состояние';
+  rsEnable              = 'Включено';
+  rsDisable             = 'Выключено';
+  rsExit                = 'Выход';
+  rsHint                = 'Я здесь';
+  rsBaloonCaptionStatus = 'Состояние';
+  rsBaloonCaptionError  = 'Ошибка';
+
+const
+  EVENT_DELAY = 1000 * 10;
+
+
+function GetSysErrorMessage(ErrorCode: Integer): String;
+const
+  MaxMsgSize = Format_Message_Max_Width_Mask;
+var
+  MsgBuffer: UnicodeString;
+  len: longint;
+begin
+  SetLength(MsgBuffer, MaxMsgSize);
+  len := FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nil, ErrorCode, MakeLangId(LANG_NEUTRAL, SUBLANG_DEFAULT), PUnicodeChar(MsgBuffer), MaxMsgSize, nil);
+  if (len > 1) and (MsgBuffer[len - 1] = #13) and (MsgBuffer[len] = #10) then
+    Dec(len, 2);
+  SetLength(MsgBuffer, len);
+  Result := MsgBuffer;
+end;
 
 
 procedure TApp.SetEnable(AEnable: Boolean);
@@ -78,8 +98,6 @@ type
     Input: tagMOUSEINPUT;
   end;
 
-const
-  INPUT_MOUSE = $0;
 var
   Input: tagINPUT;
 begin
@@ -93,7 +111,11 @@ begin
   Input.Input.time := 0;
 
   //Пошевелить мышку
-  SendInput(1, @Input, SizeOf(Input));
+  if SendInput(1, @Input, SizeOf(Input)) = 0 then
+  begin
+    SetEnable(False);
+    FTrayIcon.ShowMessage(rsBaloonCaptionError, GetSysErrorMessage(GetLastError), mtError);
+  end;
 end;
 
 
@@ -172,7 +194,7 @@ begin
       s := rsEnable
     else
       s := rsDisable;
-    FTrayIcon.ShowMessage(rsBaloonCaption, s, mtInfo);
+    FTrayIcon.ShowMessage(rsBaloonCaptionStatus, s, mtInfo);
   end;
 end;
 
@@ -191,7 +213,7 @@ begin
   FTrayIcon.OnMouseDblClick := @TrayIconMouseDblClick;
 
   //Таймерное событие
-  FTimeEvent := TsgeSystemTimeEvent.Create(1000 * 60, False, @TimerEvent);
+  FTimeEvent := TsgeSystemTimeEvent.Create(EVENT_DELAY, False, @TimerEvent);
 
   //Включить присутствие
   SetEnable(True);
