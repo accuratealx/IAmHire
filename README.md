@@ -9,9 +9,13 @@
 ![](https://img.shields.io/github/languages/top/accuratealx/IAmHere)
 
 ## Установка:
-0. Скачать последнюю версию и положить в любой каталог
-1. Запустить
+1. Скачать последнюю версию и положить в любой каталог
+2. Запустить
+
+# Возможности:
+- Имитация движения мышки через 1 минуту
 
 ## Скриншоты:
-![](https://github.com/accuratealx/IAmHere/raw/master/Doc/Screenshots/Screenshot001.png)
-![](https://github.com/accuratealx/IAmHere/raw/master/Doc/Screenshots/Screenshot002.png)
+![](https://github.com/accuratealx/IAmHere/raw/master/Screenshots/Screenshot002.png)
+![](https://github.com/accuratealx/IAmHere/raw/master/Screenshots/Screenshot001.png)
+
