@@ -15,6 +15,9 @@
 ## Возможности:
 - Имитация движения мышки через 1 минуту
 
+## Зависимости:
+- [Simple Game Engine 2](https://github.com/accuratealx/SimpleGameEngine2)
+
 ## Скриншоты:
 ![](https://github.com/accuratealx/IAmHere/raw/master/Screenshots/Screenshot002.png)
 ![](https://github.com/accuratealx/IAmHere/raw/master/Screenshots/Screenshot001.png)
